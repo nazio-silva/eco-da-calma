@@ -1,0 +1,461 @@
+:root {
+    --text-color: #445566;
+    --bg-soft-blue: #E1F5FE;  /* Azul céu muito claro */
+    --active-blue: #81D4FA;   /* Azul médio suave */
+    --soft-green: #C8E6C9;    /* Verde menta */
+    --soft-gray: #F5F5F5;     /* Cinza neutro */
+    --border-color: #B0BEC5;
+}
+
+/* --- CONFIGURAÇÕES GERAIS --- */
+body {
+    background-color: #E1F5FE; /* Azul clarinho relaxante */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Container Principal */
+.game-container {
+    background: #FFFFFF;
+    border-radius: 30px;
+    border: 4px solid #C8E6C9;
+    padding: 0; /* Tiramos o padding inicial para a imagem encostar no topo */
+    max-width: 500px;
+    width: 90%;
+    overflow: hidden; /* Garante que a imagem respeite o arredondamento do container */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* Ajuste do Título e Conteúdo (para compensar o padding 0 do container) */
+h1, .game-menu, #escrita-section {
+    /* padding-left: 25px;
+    padding-right: 25px; */
+    text-align: center;
+    margin: 10px;
+}
+
+/* Estilo da Imagem Interna */
+.header-image-container {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border-bottom: 3px solid #E8F5E9;
+}
+
+.internal-banner {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Faz a imagem preencher o espaço sem distorcer */
+    object-position: center; /* Foca no centro da imagem */
+    display: block;
+}
+
+/* --- MENU DE NAVEGAÇÃO --- */
+.game-menu {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.menu-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 15px;
+    border: 2px solid var(--border-color);
+    background: var(--soft-gray);
+    color: var(--text-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menu-btn.active {
+    background-color: #E8F5E9 !important; /* Verde menta quase branco */
+    border-color: #A5D6A7 !important;     /* Borda menta suave */
+    color: #388E3C !important;            /* Texto verde escuro calmo */
+    transform: scale(1.02);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.03); /* Sombra interna mínima */
+}
+
+/* --- PLACAR E STATUS --- */
+.score-container {
+    background: #fff9c4;
+    padding: 8px;
+    border-radius: 50px;
+    margin-bottom: 15px;
+    display: inline-block;
+    padding: 5px 20px;
+    font-weight: bold;
+}
+
+/* Container das estrelas na aba de cores */
+.score-container-cores {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente o conteúdo */
+    align-items: center;     /* Alinha verticalmente os itens (ícone e número) */
+    margin: 15px 0;          /* Espaço entre o topo/banner e o placar */
+    
+    /* Estilo para parecer um distintivo amigável */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #FBC02D;          /* Cor de ouro suave */
+    background: #FFF9C4;     /* Fundo amarelo pastel bem clarinho */
+    padding: 8px 20px;
+    border-radius: 50px;     /* Formato arredondado de pílula */
+    border: 2px solid #FFF176;
+    
+    /* Garante que ocupe apenas o espaço do texto, mas centralizado no pai */
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.star-badge { color: #fbc02d; font-size: 1.2rem; }
+.trophy-badge { color: #f57c00; margin-left: 10px; animation: bounce 2s infinite; }
+
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+/* --- TERMÔMETRO DE ENERGIA --- */
+.meter-bar {
+    display: flex;
+    height: 25px;
+    width: 100%;
+    background: #eeeeee;
+    border-radius: 50px;
+    overflow: hidden;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+}
+
+.zone { height: 100%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.green { background-color: #8bc34a; }
+.yellow { background-color: #ffeb3b; }
+.red { background-color: #f44336; }
+
+/* --- QUADRO DE ESCRITA (CANVAS) --- */
+.canvas-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-container {
+    position: relative;
+    background: #FAFAFA;
+    border: 6px solid var(--soft-green);
+    border-radius: 25px;
+    width: 95%; /* Ocupa quase toda a largura da tela */
+    max-width: 600px; /* Mas não fica exageradamente grande em telas largas */
+    height: 350px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Card selecionado com feedback suave */
+.card.selected {
+    background-color: #E8F5E9 !important; /* Verde menta bem clarinho */
+    border-color: #81C784 !important;     /* Borda verde um pouco mais definida */
+    transform: scale(1.05);                /* Aumenta levemente */
+    box-shadow: 0 0 15px rgba(129, 199, 132, 0.3); /* Brilho suave ao redor */
+    transition: all 0.3s ease;
+}
+
+/* Garante que os outros cards fiquem um pouco mais apagados para destacar a escolha */
+.card-options.choice-made .card:not(.selected) {
+    opacity: 0.6;
+    filter: grayscale(0.5); /* Fica levemente cinza para tirar a distração */
+    pointer-events: none;   /* Impede clicar em outro enquanto processa */
+}
+
+#canvas-hint {
+    position: absolute;
+    font-size: 250px;
+    font-weight: bold;
+    user-select: none;
+    pointer-events: none;
+    
+    /* TRUQUE PARA LINHA TRACEJADA */
+    color: transparent; /* Esconde o preenchimento */
+    -webkit-text-stroke: 2px #B0BEC5; /* Cor da borda suave */
+    text-shadow: none;
+    
+    /* Criando o efeito tracejado com máscara ou borda */
+    background-image: linear-gradient(to right, #B0BEC5 50%, rgba(255,255,255,0) 0%);
+    background-position: bottom;
+    background-size: 20px 1px;
+    background-repeat: repeat-x;
+}
+
+#writingCanvas {
+    position: relative;
+    z-index: 2;
+    touch-action: none;
+}
+
+/* Botão de Repetir Áudio */
+.btn-repeat-audio {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 3;
+    background: #e3f2fd;
+    border: 2px solid #4a6c90;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #90caf9;
+}
+
+.btn-repeat-audio:active { transform: translateY(2px); box-shadow: 0 2px 0 #90caf9; }
+
+/* Controles do Quadro */
+.canvas-controls {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.ctrl-btn {
+    flex: 1;
+    border: none;
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+}
+
+.btn-clear { background-color: #cfd8dc; color: #455a64; }
+.btn-confirm { background-color: #4CAF50; color: white; }
+.ctrl-btn:active { transform: translateY(2px); box-shadow: none; }
+
+/* --- PAINÉIS DE APRENDIZADO --- */
+.learning-panel {
+    margin-top: 20px;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 20px;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+}
+
+.char-btn {
+    aspect-ratio: 1;
+    border: none;
+    background: white;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 3px 0 #ddd;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.char-btn:active { transform: translateY(2px); box-shadow: none; }
+
+/* --- JORNADA E CARTAS --- */
+.card-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.card {
+    background: #e3f2fd;
+    border: 2px solid #90caf9;
+    border-radius: 15px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card:hover { transform: scale(1.02); }
+
+.card img { width: 50px; height: 50px; margin-bottom: 5px; }
+
+/* --- UTILITÁRIOS --- */
+.hidden { display: none !important; }
+
+.message-area {
+    position: fixed;
+    bottom: 20px;
+    background: #333;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+/* --- ANIMAÇÃO DE ESTRELA --- */
+.star-animation {
+    position: absolute;
+    pointer-events: none;
+    animation: starPop 1s ease-out forwards;
+    z-index: 2000;
+}
+
+/* --- PAINEL DE JORNADA --- */
+#jornada-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza horizontalmente */
+    justify-content: center;
+    text-align: center;
+    margin: 10px;
+}
+
+/* Centralizando os Scenários e Textos */
+.scenario-display {
+    background-color: #f9fbfd; /* Azul quase branco */
+    border: 2px solid #e1f5fe;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 15px 0;
+    width: 90%;
+}
+
+.scenario-display-cores {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza horizontalmente os filhos */
+    justify-content: center;
+    text-align: center; /* Garante que as linhas de texto quebrem centralizadas */
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+
+/* Centralizando os Cards de Ação */
+.card-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Garante que os cards fiquem no meio */
+    gap: 15px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.card {
+    background: #ffffff;
+    border: 2px solid #c8e6c9; /* Verde menta suave */
+    border-radius: 20px;
+    padding: 15px;
+    width: 140px; /* Tamanho fixo para simetria */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+#next-scenario-btn {
+    /* Cores Pastel Relaxantes */
+    background-color: #E8F5E9; /* Mesmo verde menta clarinho do menu */
+    color: #388E3C;            /* Texto verde escuro calmo */
+    border: 3px solid #A5D6A7; /* Borda menta suave */
+    
+    /* Forma e Espaçamento */
+    border-radius: 50px;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 30px;
+    
+    /* Efeito de Profundidade Suave */
+    box-shadow: 0 4px 0 #C8E6C9; 
+    transition: all 0.2s ease;
+    display: inline-block;
+    outline: none;
+}
+
+/* Efeito ao passar o mouse (Suave) */
+#next-scenario-btn:hover {
+    background-color: #F1F8E9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #C8E6C9;
+}
+
+/* Efeito ao clicar (Feedback tátil) */
+#next-scenario-btn:active {
+    background-color: #A5D6A7;
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #C8E6C9;
+}
+
+#trophy-display {
+    display: none; /* Começa escondido */
+    color: #FBC02D; /* Amarelo ouro suave */
+    font-weight: bold;
+    font-size: 1.2rem;
+    background: #FFF9C4; /* Fundo amarelo clarinho */
+    padding: 5px 15px;
+    border-radius: 50px;
+    margin-left: 10px;
+    border: 2px solid #FFF176;
+}
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+#instrucao-cores {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #37474F; /* Cor suave e legível */
+}
+
+/* Estilo para o P (Qual cor você...) */
+#pergunta-cores {
+    margin: 10px 0 0 0;
+    font-size: 1.1rem;
+    color: #546E7A;
+    font-weight: 500;
+}
+
+.color-circle {
+    height: 80px;
+    border-radius: 20px;
+    border: 5px solid white;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.color-circle:active {
+    transform: scale(0.9);
+}
+
+/* Animação suave para o troféu */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes starPop {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-150px) scale(2); opacity: 0; }
+}
+

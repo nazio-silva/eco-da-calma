@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Eco da Calma</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+
+        <div class="header-image-container">
+            <img src="img/tea.png" alt="Ilustração Acolhedora" class="internal-banner">
+        </div>
+        
+        <h1>Exploradores do Som & Silêncio</h1>
+
+        <nav class="game-menu">
+            <button class="menu-btn active" id="btn-jornada" onclick="switchTab('jornada')">🎮 Jornada</button>
+            <button class="menu-btn" id="btn-letras" onclick="switchTab('letras')">🔠 Letras</button>
+            <button class="menu-btn" id="btn-numeros" onclick="switchTab('numeros')">🔢 Números</button>
+            <button class="menu-btn" id="btn-cores" onclick="switchTab('cores')">🎨 Cores</button>
+        </nav>
+
+        <div id="jornada-panel" class="tab-content">
+            <div class="score-container">
+                ⭐ Estrelas: <span id="star-count">0</span>
+                <span id="trophy-display" style="display:none;"> | 🏆 Mestre da Calma!</span>
+            </div>
+                    
+            <div class="energy-meter">
+                <div class="meter-bar">
+                    <div class="zone red" id="zone-red"></div>
+                    <div class="zone yellow" id="zone-yellow"></div>
+                    <div class="zone green" id="zone-green"></div>
+                </div>
+                <p id="energy-level-text">Nível: Calmo</p>
+            </div>
+
+            <div class="scenario-display">
+                <h2 id="current-scenario">Cenário</h2>
+                <p id="scenario-description">...</p>
+            </div>
+
+             <div class="action-panel">
+                <div class="card-options"></div>
+                <button id="next-scenario-btn" class="next-btn">Próximo Cenário</button>
+            </div>
+        </div>
+
+        <div id="escrita-section" class="tab-content hidden">
+            <div class="canvas-wrapper">
+                <div class="canvas-container">
+                    <div id="canvas-hint">A</div> 
+                    <canvas id="writingCanvas" width="320" height="320"></canvas>
+                    <button class="btn-repeat-audio" onclick="repetirSomAtual()" title="Ouvir novamente">🔊</button>
+                </div>
+            </div>
+
+            <div class="canvas-controls">
+                <button onclick="clearCanvas()" class="ctrl-btn btn-clear">🗑️ Limpar</button>
+                <button onclick="confirmarAcerto()" class="ctrl-btn btn-confirm">✅ Pronto!</button>
+            </div>
+
+            <div id="letras-panel" class="learning-panel">
+                <div class="button-group" id="alphabet-group"></div>
+            </div>
+
+            <div id="numeros-panel" class="learning-panel hidden">
+                <div class="button-group" id="numbers-group"></div>
+            </div>
+        </div>
+
+        <div id="cores-panel" class="tab-content hidden">
+            <div class="score-container-cores">⭐ Estrelas: <span id="star-count-cores">0</span></div>
+            
+            <div class="scenario-display-cores">
+                <h2 id="instrucao-cores">Toque nas cores para aprender!</h2>
+                <p id="pergunta-cores">Qual cor você mais gosta?</p>
+            </div>
+
+            <div class="color-grid" id="color-grid">
+                </div>
+        </div>
+
+        <div id="celebration-overlay"></div>
+        <div id="message-area" class="message-area"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
