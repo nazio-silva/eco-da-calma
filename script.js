@@ -68,8 +68,213 @@ const coresData = [
     { nome: "Marrom", hex: "#BCAAA4" }     // Marrom Argila
 ];
 
+// CONFIGURAÇÃO DO ENCAIXE
+const puzzles = [
+    { id: 'p1', emoji: '🐶', casa: '🏠' }, { id: 'p2', emoji: '🐱', casa: '🧶' }, { id: 'p3', emoji: '🐦', casa: '🌲' },
+    { id: 'p4', emoji: '🐰', casa: '🕳️' }, { id: 'p5', emoji: '🐢', casa: '🏖️' }, { id: 'p6', emoji: '🐟', casa: '🫧' },
+    { id: 'p7', emoji: '🐝', casa: '🍯' }, { id: 'p8', emoji: '🐒', casa: '🌴' }, { id: 'p9', emoji: '🐸', casa: '🪷' }
+];
+
+let indiceGrupo = 0;
+let acertosNoGrupo = 0;
+const ITENS_POR_VEZ = 3;
+
+
+// FORMAS GEOMETRICAS
+const formasData = [
+    { nome: "Quadrado", classe: "quadrado" },
+    { nome: "Círculo", classe: "circulo" },
+    { nome: "Triângulo", classe: "triangulo" },
+    { nome: "Retângulo", classe: "retangulo" },
+    { nome: "Estrela", classe: "estrela" },
+    { nome: "Coração", classe: "coracao" }
+];
+
 let corAlvo = "";
 let modoDesafio = false;
+
+
+let formaCorreta = null;
+let hintTimeout = null;
+
+function carregarJogoFormas() {
+    const targetContainer = document.getElementById('target-shape');
+    const optionsGrid = document.getElementById('formas-options');
+    clearTimeout(hintTimeout); // Limpa timer anterior
+
+    // Sorteia a forma alvo
+    formaCorreta = formasData[Math.floor(Math.random() * formasData.length)];
+    
+    // Renderiza a forma alvo
+    targetContainer.className = `shape ${formaCorreta.classe}`;
+    falar(`Onde está o ${formaCorreta.nome}?`);
+
+    // Renderiza opções
+    optionsGrid.innerHTML = '';
+    formasData.forEach(forma => {
+        const btn = document.createElement('div');
+        btn.className = `shape ${forma.classe}`;
+        btn.id = `opt-${forma.classe}`;
+        btn.onclick = () => validarForma(forma.nome);
+        optionsGrid.appendChild(btn);
+    });
+
+    // Inicia cronômetro de 8 segundos para a dica (pulsar)
+    hintTimeout = setTimeout(() => {
+        const corretaBtn = document.getElementById(`opt-${formaCorreta.classe}`);
+        if (corretaBtn) {
+            corretaBtn.classList.add('pulsar');
+            falar(`Olha aqui o ${formaCorreta.nome}`);
+        }
+    }, 8000);
+}
+
+function validarForma(nomeSelecionado) {
+    clearTimeout(hintTimeout); 
+    
+    // Remove o pulsar de todas
+    document.querySelectorAll('.shape').forEach(el => el.classList.remove('pulsar'));
+
+    const elementoCorreto = document.getElementById(`opt-${formaCorreta.classe}`);
+    const formaAlvo = document.getElementById('target-shape');
+
+    if (nomeSelecionado === formaCorreta.nome) {
+        createStarsEffect(); // Reutiliza suas estrelas subindo
+        stars++;
+        const displayStars = document.getElementById('star-count-formas');
+        if(displayStars) displayStars.textContent = stars;
+        
+        falar("Excelente! Você encontrou o " + nomeSelecionado);
+        createStarsEffect();
+
+        // ATIVA A EXPLOSÃO
+        if(formaAlvo) formaAlvo.classList.add('animar-explosao');
+        if(elementoCorreto) elementoCorreto.classList.add('animar-explosao');
+
+        // GERA NOVA PARTIDA MAIS RÁPIDO (1.5 segundos é o ideal)
+        setTimeout(() => {
+            if(formaAlvo) formaAlvo.classList.remove('animar-explosao');
+            carregarJogoFormas(); 
+        }, 4500);
+
+    } else {
+        falar("Esse é o " + nomeSelecionado + ". Tente encontrar o " + formaCorreta.nome);
+        
+        hintTimeout = setTimeout(() => {
+            if (elementoCorreto) {
+                elementoCorreto.classList.add('pulsar');
+                falar("Olha aqui, o " + formaCorreta.nome + " está pulsando.");
+            }
+        }, 8000); 
+    }
+}
+
+function initEncaixe() {
+    const slotsArea = document.getElementById('slots-area');
+    const piecesArea = document.getElementById('pieces-area');
+    
+    // Proteção contra o erro 'null'
+    if (!slotsArea || !piecesArea) {
+        console.error("ERRO: Os elementos 'slots-area' ou 'pieces-area' não existem no HTML.");
+        return; 
+    }
+
+    // Limpeza para a nova fase
+    slotsArea.innerHTML = ''; 
+    piecesArea.innerHTML = '';
+    acertosNoGrupo = 0;
+
+    // Lógica de fatiamento circular
+    let inicio = (indiceGrupo * ITENS_POR_VEZ) % puzzles.length;
+    let puzzlesAtuais = puzzles.slice(inicio, inicio + ITENS_POR_VEZ);
+
+    // Criar Slots (Casas)
+    puzzlesAtuais.forEach(p => {
+        const slot = document.createElement('div');
+        slot.className = 'slot'; 
+        slot.dataset.id = p.id;
+        slot.innerHTML = p.casa;
+        slot.ondragover = (e) => e.preventDefault();
+        slot.ondrop = (e) => lidarComDrop(e, slot);
+        slotsArea.appendChild(slot);
+    });
+
+    // Criar Peças (Animais)
+    [...puzzlesAtuais].sort(() => Math.random() - 0.5).forEach(p => {
+        const piece = document.createElement('div');
+        piece.className = 'piece';
+        piece.draggable = true;
+        piece.innerHTML = p.emoji;
+        piece.dataset.id = p.id;
+        piece.ondragstart = (e) => e.dataTransfer.setData('text', p.id);
+        piecesArea.appendChild(piece);
+    });
+}
+
+function lidarComDrop(e, slot) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text');
+    const peca = document.querySelector(`.piece[data-id="${id}"]`);
+
+    if (id === slot.dataset.id && peca) {
+        if (slot.classList.contains('slot-filled')) return;
+
+        slot.innerHTML = peca.innerHTML;
+        slot.classList.add('slot-filled');
+        peca.style.display = 'none';
+
+        acertosNoGrupo++;
+        stars++;
+        
+        // Atualiza o placar específico do encaixe
+        const countDisplay = document.getElementById('count-encaixe');
+        if (countDisplay) countDisplay.textContent = stars;
+        
+        falar("Muito bem!");
+        createStarsEffect();
+
+        if (acertosNoGrupo === ITENS_POR_VEZ) {
+            setTimeout(() => {
+                indiceGrupo++; // Avança o grupo
+                initEncaixe(); // Gera a próxima fase
+            }, 1200);
+        }
+    } else {
+        falar("Tente outro lugar!");
+    }
+}
+
+// LÓGICA DO TEMPORIZADOR DE CALMA
+let holdTimer;
+let progress = 0;
+const holdBtn = document.getElementById('calm-hold-btn');
+
+function startHold() {
+    holdTimer = setInterval(() => {
+        progress += 2;
+        document.getElementById('progress-circle').style.borderColor = `hsl(${progress}, 70%, 70%)`;
+        document.getElementById('progress-circle').style.transform = `scale(${1 + progress/200})`;
+        
+        if (progress >= 100) {
+            clearInterval(holdTimer);
+            falar("Parabéns! Você está calmo e tranquilo.");
+            document.getElementById('calm-message').textContent = "Concluído! 🌟";
+            createStarsEffect();
+        }
+    }, 50);
+}
+
+function stopHold() {
+    clearInterval(holdTimer);
+    progress = 0;
+    document.getElementById('progress-circle').style.transform = `scale(1)`;
+    document.getElementById('progress-circle').style.borderColor = '#e1f5fe';
+}
+
+holdBtn.addEventListener('mousedown', startHold);
+holdBtn.addEventListener('mouseup', stopHold);
+holdBtn.addEventListener('touchstart', startHold);
+holdBtn.addEventListener('touchend', stopHold);
 
 // --- MOTOR DE VOZ ---
 function falar(texto) {
@@ -248,7 +453,7 @@ function confirmarAcerto() {
 }
 
 // --- LOGICA DE NAVEGAÇÃO ---
-function switchTab(tab) {
+/*function switchTab(tab) {
     // 1. Esconder todos os painéis
     document.querySelectorAll('.tab-content').forEach(panel => {
         panel.classList.add('hidden');
@@ -291,6 +496,69 @@ function switchTab(tab) {
         falar("Vamos aprender as cores! Qual cor você quer ver agora?");
     }
 }
+*/
+
+function switchTab(tab) {
+    // 1. Esconder todos os painéis e remover estados ativos
+    document.querySelectorAll('.tab-content').forEach(panel => panel.classList.add('hidden'));
+    document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+
+    // 2. Lógica para cada aba
+    if (tab === 'jornada') {
+        document.getElementById('jornada-panel').classList.remove('hidden');
+        document.getElementById('btn-jornada').classList.add('active');
+        renderScenario();
+    } 
+    else if (tab === 'letras') {
+        document.getElementById('escrita-section').classList.remove('hidden');
+        document.getElementById('letras-panel').classList.remove('hidden');
+        document.getElementById('numeros-panel').classList.add('hidden');
+        document.getElementById('btn-letras').classList.add('active');
+        selecionarItemNoQuadro('A');
+    } 
+    else if (tab === 'numeros') {
+        document.getElementById('escrita-section').classList.remove('hidden');
+        document.getElementById('numeros-panel').classList.remove('hidden');
+        document.getElementById('letras-panel').classList.add('hidden');
+        document.getElementById('btn-numeros').classList.add('active');
+        selecionarItemNoQuadro('0');
+    }
+    else if (tab === 'cores') {
+        document.getElementById('cores-panel').classList.remove('hidden');
+        // Certifique-se de que o ID do botão no HTML seja 'btn-cores'
+        if(document.getElementById('btn-cores')) document.getElementById('btn-cores').classList.add('active');
+        carregarCores();
+        falar("Vamos aprender as cores!");
+    }
+    else if (tab === 'formas') {
+        document.getElementById('formas-panel').classList.remove('hidden');
+        if(document.getElementById('btn-formas')) document.getElementById('btn-formas').classList.add('active');
+        carregarJogoFormas();
+    }
+    else if (tab === 'encaixe') {
+        // 1. Mostrar o painel de encaixe
+        document.getElementById('encaixe-panel').classList.remove('hidden');
+        
+        // 2. Ativar a cor verde no botão do menu
+        const btnEncaixe = document.getElementById('btn-encaixe');
+        if (btnEncaixe) btnEncaixe.classList.add('active');
+
+        // 3. Esconder a seção de escrita (letras/números) se estiver aberta
+        const escritaSec = document.getElementById('escrita-section');
+        if (escritaSec) escritaSec.classList.add('hidden');
+
+        // 4. Iniciar o jogo
+        initEncaixe();
+        falar("Vamos encontrar o par de cada um?");
+    }
+    else if (tab === 'calma') {
+        document.getElementById('calma-panel').classList.remove('hidden');
+        if(document.getElementById('btn-calma')) document.getElementById('btn-calma').classList.add('active');
+        stopHold(); // Garante que o timer comece zerado
+        falar("Hora de respirar fundo. Segure o botão.");
+    }
+}
+
 function selecionarItemNoQuadro(valor) {
     itemAtual = valor;
     document.getElementById('canvas-hint').textContent = valor;
@@ -393,7 +661,7 @@ function createStarsEffect() {
         star.innerHTML = '⭐';
         star.style.left = Math.random() * 100 + 'vw';
         star.style.top = '80vh';
-        celebrationOverlay.appendChild(star);
+        // celebrationOverlay.appendChild(star);
         setTimeout(() => star.remove(), 1000);
     }
 }

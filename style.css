@@ -57,20 +57,40 @@ h1, .game-menu, #escrita-section {
 /* --- MENU DE NAVEGAÇÃO --- */
 .game-menu {
     display: flex;
-    gap: 12px;
-    margin-bottom: 25px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px; /* Aumentamos o respiro interno */
+    margin: 0 auto 20px auto; /* Centraliza o menu na tela */
+    width: 95%; /* Garante que o menu não encoste nas bordas do celular */
+    max-width: 600px; /* Limita a largura em telas grandes */
+    box-sizing: border-box; /* Garante que o padding não aumente o tamanho final */
 }
 
 .menu-btn {
-    flex: 1;
-    padding: 12px;
+    /* Garante que o botão tenha um tamanho bom para o toque */
+    padding: 12px 15px;
+    min-width: 100px; /* Impede que fiquem muito estreitos */
+    flex: 1 1 auto; /* Permite que cresçam para preencher a linha uniformemente */
+    max-width: 140px; /* Impede que fiquem largos demais em telas grandes */
+    
+    border: 2px solid #C8E6C9;
     border-radius: 15px;
-    border: 2px solid var(--border-color);
-    background: var(--soft-gray);
-    color: var(--text-color);
-    font-weight: 600;
+    background-color: #f9f9f9;
+    font-size: 0.9rem;
+    font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    
+    /* Centraliza o texto e emoji dentro do botão */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+
+    flex: 1 1 calc(33% - 10px); /* Tenta manter 3 botões por linha no celular */
+    min-width: 90px;
+    margin: 2px; /* Margem extra para evitar toques acidentais */
 }
 
 .menu-btn.active {
@@ -343,6 +363,44 @@ h1, .game-menu, #escrita-section {
     padding: 0 10px;
 }
 
+.scenario-display-encaixe-painel {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza horizontalmente os filhos */
+    justify-content: center;
+    text-align: center; /* Garante que as linhas de texto quebrem centralizadas */
+    padding: 20px;
+    background-color: #f9fbfd; /* Azul quase branco */
+    border: 2px solid #e1f5fe;
+    border-radius: 20px;
+    margin: 15px;
+}
+
+.scenario-display-formas-geometricas {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza horizontalmente os filhos */
+    justify-content: center;
+    text-align: center; /* Garante que as linhas de texto quebrem centralizadas */
+    padding: 20px;
+    background-color: #f9fbfd; /* Azul quase branco */
+    border: 2px solid #e1f5fe;
+    border-radius: 20px;
+    margin: 15px;
+}
+
+.scenario-display-calma {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza horizontalmente os filhos */
+    justify-content: center;
+    text-align: center; /* Garante que as linhas de texto quebrem centralizadas */
+    padding: 20px;
+    background-color: #f9fbfd; /* Azul quase branco */
+    border: 2px solid #e1f5fe;
+    border-radius: 20px;
+    margin: 15px;
+}
 
 /* Centralizando os Cards de Ação */
 .card-options {
@@ -448,6 +506,179 @@ h1, .game-menu, #escrita-section {
     transform: scale(0.9);
 }
 
+/* PAINEL DE ENCAIXE E MOMENTO DA CALMA */
+/* JOGO DE ENCAIXE */
+.puzzle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px; /* Mais espaço entre a área de casas e a de animais */
+    padding: 30px 10px;
+}
+
+.drop-zone, .drag-zone {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.slot {
+    width: 100px;  /* Aumentado de 70px para 100px */
+    height: 100px; /* Aumentado de 70px para 100px */
+    background: rgba(255, 255, 255, 0.2);
+    border: 4px dashed #BDBDBD; /* Borda mais grossa para melhor visualização */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem; /* Emoji da casa maior */
+    transition: all 0.3s;
+}
+
+.piece {
+    width: 90px;   /* Aumentado de 70px para 90px */
+    height: 90px;  /* Aumentado de 70px para 90px */
+    background: white;
+    border: 3px solid #eee;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem; /* Emoji do animal maior */
+    cursor: grab;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Sombra mais forte para parecer "pegável" */
+    touch-action: none;
+    transition: transform 0.2s;
+}
+
+/* Efeito visual quando o animal está sendo arrastado */
+.piece:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+    z-index: 100;
+}
+
+/* Estilo para quando o animal é encaixado com sucesso */
+.slot-filled {
+    border-style: solid;
+    background-color: #E8F5E9;
+    border-color: #A5D6A7;
+    animation: pop 0.4s ease-out;
+}
+
+/* Efeito de sumir suave quando a fase termina */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Garante que o slot preenchido brilhe */
+.slot-filled {
+    border: 3px solid #4CAF50 !important;
+    background-color: #C8E6C9 !important;
+    transform: scale(1.05);
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* TEMPORIZADOR DE CALMA */
+.timer-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+#progress-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 10px solid #e1f5fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.1s;
+}
+
+#calm-hold-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: none;
+    background: #81d4fa;
+    font-size: 2.5rem;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #4fc3f7;
+}
+
+#calm-hold-btn:active {
+    transform: scale(0.9);
+    background: #4fc3f7;
+}
+
+/* FORMAS GEOMETRICAS */
+/* Container da forma principal */
+#target-shape-container {
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* Estilos básicos das formas */
+.shape {
+    width: 80px;
+    height: 80px;
+    background-color: #5C6BC0;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+/* Classes específicas para cada formato */
+.shape.quadrado { width: 80px; height: 80px; background: #5C6BC0; border-radius: 10px; }
+.shape.circulo { width: 80px; height: 80px; background: #FF7043; border-radius: 50%; }
+.shape.retangulo { width: 100px; height: 60px; background: #4DB6AC; border-radius: 8px; }
+
+/* Triângulo Corrigido */
+.shape.triangulo { 
+    width: 0; height: 0; 
+    border-left: 45px solid transparent;
+    border-right: 45px solid transparent;
+    border-bottom: 80px solid #AFB42B;
+    background: transparent !important; /* Essencial */
+}
+
+/* Novas Formas usando Emojis ou caracteres para evitar bugs de borda */
+.shape.estrela::before { content: "⭐"; font-size: 80px; }
+.shape.coracao::before { content: "❤️"; font-size: 80px; }
+.shape.estrela, .shape.coracao { background: transparent !important; border: none; }
+
+/* ANIMAÇÃO CORRIGIDA (Pulsar sem sumir) */
+@keyframes pulsar-correta {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(76, 175, 80, 0)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(76, 175, 80, 0.8)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(76, 175, 80, 0)); }
+}
+
+.pulsar {
+    animation: pulsar-correta 1.5s infinite ease-in-out !important;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+    justify-items: center;
+}
+
 /* Animação suave para o troféu */
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
@@ -459,3 +690,52 @@ h1, .game-menu, #escrita-section {
     100% { transform: translateY(-150px) scale(2); opacity: 0; }
 }
 
+@keyframes explosao-sucesso-uau {
+    0% { 
+        transform: scale(1);
+        filter: brightness(1);
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
+    15% { 
+        transform: scale(0.8); /* Antecipação mais lenta */
+        filter: brightness(1.2);
+        background-color: #4CAF50 !important; /* Muda para Verde Sucesso */
+    }
+    45% { 
+        transform: scale(2.2); /* Expansão majestosa */
+        filter: brightness(1.8);
+        opacity: 1;
+    }
+    100% { 
+        transform: scale(3.5);
+        opacity: 0;
+        filter: brightness(2) blur(8px);
+        /* Partículas de "Sucesso" em tons de verde e amarelo */
+        box-shadow: 
+            0 -140px 0 -15px #8BC34A,
+            100px -100px 0 -20px #FFD700,
+            140px 0 0 -15px #4CAF50,
+            100px 100px 0 -20px #C8E6C9,
+            0 140px 0 -15px #8BC34A,
+            -100px 100px 0 -20px #FFD700,
+            -140px 0 0 -15px #4CAF50,
+            -100px -100px 0 -20px #C8E6C9;
+    }
+}
+
+.animar-explosao {
+    /* Tempo aumentado para 1.2 segundos (mais suave e visível) */
+    animation: explosao-sucesso-uau 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+    background-color: #4CAF50 !important; 
+    border-radius: 50% !important;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* Ajuste para o triângulo não quebrar a cor de sucesso */
+.shape.triangulo.animar-explosao {
+    border: none !important;
+    width: 80px !important;
+    height: 80px !important;
+    background-color: #4CAF50 !important;
+}

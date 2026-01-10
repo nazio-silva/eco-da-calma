@@ -20,6 +20,9 @@
             <button class="menu-btn" id="btn-letras" onclick="switchTab('letras')">🔠 Letras</button>
             <button class="menu-btn" id="btn-numeros" onclick="switchTab('numeros')">🔢 Números</button>
             <button class="menu-btn" id="btn-cores" onclick="switchTab('cores')">🎨 Cores</button>
+            <button class="menu-btn" id="btn-encaixe" onclick="switchTab('encaixe')">🧩 Encaixe</button>
+            <button class="menu-btn" id="btn-formas" onclick="switchTab('formas')">🟦 Formas</button>
+            <button class="menu-btn" id="btn-calma" onclick="switchTab('calma')">🧘 Calma</button>
         </nav>
 
         <div id="jornada-panel" class="tab-content">
@@ -80,12 +83,57 @@
             </div>
 
             <div class="color-grid" id="color-grid">
-                </div>
+            </div>
         </div>
 
-        <div id="celebration-overlay"></div>
-        <div id="message-area" class="message-area"></div>
+        <!-- PAINEL DE ENCAIXE -->
+        <div id="encaixe-panel" class="tab-content hidden">
+            <div class="score-container-cores">⭐ Acertos: <span id="count-encaixe">0</span></div>
+            
+            <div class="scenario-display-encaixe-painel">
+                <h2 id="instrucao-encaixe">Combine cada um com o seu lugar!</h2>
+            </div>
+
+            <div class="puzzle-container">
+                <div id="slots-area" class="drop-zone"></div>
+                
+                <div id="pieces-area" class="drag-zone"></div>
+            </div>
+        </div>
+
+        <!-- FORMAS GEOMETRICAS -->
+         <div id="formas-panel" class="tab-content hidden">
+            <div class="score-container-cores">⭐ Estrelas: <span id="star-count-formas">0</span></div>
+            
+            <div class="scenario-display-formas-geometricas">
+                <h2 id="pergunta-formas">Qual é esta forma?</h2>
+            </div>
+
+            <div id="target-shape-container">
+                <div id="target-shape"></div>
+            </div>
+
+            <div class="options-grid" id="formas-options"></div>
+        </div>
+
+        <!-- MOMENTO DA CALMA -->
+        <div id="calma-panel" class="tab-content hidden">
+            <div class="scenario-display-calma">
+                <h2>Momento de Respiração</h2>
+                <p>Segure o botão para encher o balão de calma...</p>
+            </div>
+            <div class="timer-wrapper">
+                <div id="progress-circle">
+                    <button id="calm-hold-btn">🔘</button>
+                </div>
+                <p id="calm-message">Mantenha pressionado</p>
+            </div>
+        </div>
+
+       
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
